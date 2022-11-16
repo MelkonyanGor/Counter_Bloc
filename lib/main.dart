@@ -13,7 +13,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: MyHomePage(),
+      debugShowCheckedModeBanner: false,
+      home: Wraper(),
+    );
+  }
+}
+
+class Wraper extends StatelessWidget {
+  const Wraper({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CounterBloc>(
+          create: (context) => CounterBloc(),
+        ),
+        BlocProvider<UserBloc>(
+          create: (context) => UserBloc(),
+        ),
+      ],
+      child: const MyHomePage(),
     );
   }
 }
@@ -23,23 +43,14 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final counterbloc = CounterBloc()..add(CounterDecEvent());
-    final userBloc = UserBloc();
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<CounterBloc>(
-          create: (context) => CounterBloc(),
-        ),
-        BlocProvider<UserBloc>(
-          create: (context) => userBloc,
-        ),
-      ],
-      child: Scaffold(
+    return Builder(builder: (context) {
+      return Scaffold(
         floatingActionButton: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             IconButton(
               onPressed: () {
+                final counterbloc = context.read<CounterBloc>();
                 counterbloc.add(CounterIncEvent());
               },
               icon: const Icon(
@@ -49,6 +60,7 @@ class MyHomePage extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
+                  final counterbloc = context.read<CounterBloc>();
                 counterbloc.add(CounterDecEvent());
               },
               icon: const Icon(
@@ -58,7 +70,8 @@ class MyHomePage extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                userBloc.add(UserGetUsersEvent(counterbloc.state));
+                 final userBloc = context.read<UserBloc>();
+                userBloc.add(UserGetUsersEvent(context.read<CounterBloc>().state));
               },
               icon: const Icon(
                 Icons.person,
@@ -71,7 +84,7 @@ class MyHomePage extends StatelessWidget {
           child: Column(
             children: [
               BlocBuilder<CounterBloc, int>(
-                bloc: counterbloc,
+                // bloc: counterbloc,
                 builder: (context, state) {
                   return Center(
                     child: Text(
@@ -85,7 +98,7 @@ class MyHomePage extends StatelessWidget {
                 },
               ),
               BlocBuilder<UserBloc, UserState>(
-                bloc: userBloc,
+                // bloc: userBloc,
                 builder: (context, state) {
                   return Column(
                     children: [
@@ -100,7 +113,7 @@ class MyHomePage extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
