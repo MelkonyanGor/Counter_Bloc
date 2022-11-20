@@ -45,40 +45,51 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Builder(builder: (context) {
       return Scaffold(
-        floatingActionButton: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton(
-              onPressed: () {
-                final counterbloc = context.read<CounterBloc>();
-                counterbloc.add(CounterIncEvent());
-              },
-              icon: const Icon(
-                Icons.plus_one_sharp,
-                color: Colors.black,
-              ),
-            ),
-            IconButton(
-              onPressed: () {
+        floatingActionButton: BlocListener<CounterBloc, int>(
+          listener: (context, state) {
+            Scaffold.of(context).showBottomSheet((context) => Container(
+                  color: Colors.blue,
+                  height: 30.0,
+                  width: double.infinity,
+                  child: const Text('Your state is 0'),
+                ));
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                onPressed: () {
                   final counterbloc = context.read<CounterBloc>();
-                counterbloc.add(CounterDecEvent());
-              },
-              icon: const Icon(
-                Icons.exposure_minus_1,
-                color: Colors.black,
+                  counterbloc.add(CounterIncEvent());
+                },
+                icon: const Icon(
+                  Icons.plus_one_sharp,
+                  color: Colors.black,
+                ),
               ),
-            ),
-            IconButton(
-              onPressed: () {
-                 final userBloc = context.read<UserBloc>();
-                userBloc.add(UserGetUsersEvent(context.read<CounterBloc>().state));
-              },
-              icon: const Icon(
-                Icons.person,
-                color: Colors.black,
+              IconButton(
+                onPressed: () {
+                  final counterbloc = context.read<CounterBloc>();
+                  counterbloc.add(CounterDecEvent());
+                },
+                icon: const Icon(
+                  Icons.exposure_minus_1,
+                  color: Colors.black,
+                ),
               ),
-            )
-          ],
+              IconButton(
+                onPressed: () {
+                  final userBloc = context.read<UserBloc>();
+                  userBloc.add(
+                      UserGetUsersEvent(context.read<CounterBloc>().state));
+                },
+                icon: const Icon(
+                  Icons.person,
+                  color: Colors.black,
+                ),
+              )
+            ],
+          ),
         ),
         body: SafeArea(
           child: Column(
